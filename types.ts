@@ -66,3 +66,7 @@ export interface AnalysisResult {
   heroImages: HeroImage[]; // The 5 Main Images
   sections: GeneratedSection[]; // The Detail Page "Long Image" Slices
 }
+
+export interface AppSettings {
+  proxyUrl?: string; // e.g., http://127.0.0.1:7890
+}

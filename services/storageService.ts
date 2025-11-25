@@ -1,5 +1,5 @@
 
-import { ProductInput, AnalysisResult, ProcessingStep } from '../types';
+import { ProductInput, AnalysisResult, ProcessingStep, AppSettings } from '../types';
 
 const DB_NAME = 'EComGenAIDesignerDB';
 const STORE_NAME = 'appState';
@@ -12,6 +12,7 @@ export interface AppState {
   timestamp: number;
 }
 
+// IndexedDB Helper for Large Data
 const openDB = (): Promise<IDBDatabase> => {
   return new Promise((resolve, reject) => {
     if (!window.indexedDB) {
@@ -73,5 +74,26 @@ export const clearAppState = async () => {
     });
   } catch (e) {
     console.error("Failed to clear state from DB", e);
+  }
+};
+
+// LocalStorage Helper for Settings (Small Data)
+const SETTINGS_KEY = 'douyin_genai_settings';
+
+export const saveSettings = (settings: AppSettings) => {
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  } catch (e) {
+    console.error("Failed to save settings", e);
+  }
+};
+
+export const loadSettings = (): AppSettings => {
+  try {
+    const stored = localStorage.getItem(SETTINGS_KEY);
+    return stored ? JSON.parse(stored) : {};
+  } catch (e) {
+    console.error("Failed to load settings", e);
+    return {};
   }
 };

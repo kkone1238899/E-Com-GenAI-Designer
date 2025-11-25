@@ -8,8 +8,9 @@ import Preview from './components/Preview';
 import SectionControl from './components/SectionControl';
 import CarouselControl from './components/CarouselControl';
 import LoadingOverlay from './components/LoadingOverlay';
+import SettingsModal from './components/SettingsModal';
 import { translations } from './constants/translations';
-import { Wand2, AlertCircle, Key, Globe, Download, Loader2, Layers, RotateCcw, CheckCircle } from 'lucide-react';
+import { Wand2, AlertCircle, Key, Globe, Download, Loader2, Layers, RotateCcw, CheckCircle, Settings } from 'lucide-react';
 import JSZip from 'jszip';
 
 // Extend Window interface for AI Studio
@@ -28,6 +29,7 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [apiKeyReady, setApiKeyReady] = useState(false);
   const [isZipping, setIsZipping] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   
   // Storage state
   const [isRestored, setIsRestored] = useState(false);
@@ -344,6 +346,13 @@ const App: React.FC = () => {
       {/* Global Loading Overlay */}
       {step === ProcessingStep.Analyzing && <LoadingOverlay lang={language} />}
 
+      {/* Settings Modal */}
+      <SettingsModal 
+         isOpen={showSettings} 
+         onClose={() => setShowSettings(false)} 
+         lang={language} 
+      />
+
       {/* Left Sidebar / Controls */}
       <div className="w-full lg:w-5/12 xl:w-2/5 bg-white border-r border-gray-200 flex flex-col h-screen sticky top-0 z-20 overflow-y-auto">
         <div className="p-6 pb-2 border-b border-gray-50">
@@ -356,6 +365,13 @@ const App: React.FC = () => {
             </div>
             
             <div className="flex gap-2">
+              <button 
+                 onClick={() => setShowSettings(true)}
+                 className="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
+                 title={t.settings}
+              >
+                <Settings size={16} />
+              </button>
               {step !== ProcessingStep.Input && (
                 <button 
                   onClick={handleReset}

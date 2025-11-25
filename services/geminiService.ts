@@ -1,14 +1,23 @@
 
 import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { AnalysisResult, GeneratedSection, ReferenceImage, DouyinSectionType } from "../types";
+import { loadSettings } from "./storageService";
 
 // Initialize generic client - API Key will be injected via process.env.API_KEY
-// which is populated by the window.aistudio selection in App.tsx
+// Settings are loaded dynamically to support runtime changes
 const getAiClient = () => {
   if (!process.env.API_KEY) {
     throw new Error("API Key not set");
   }
-  return new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+  const settings = loadSettings();
+  const options: any = { apiKey: process.env.API_KEY };
+  
+  if (settings.proxyUrl && settings.proxyUrl.trim() !== '') {
+    options.baseUrl = settings.proxyUrl.trim();
+  }
+
+  return new GoogleGenAI(options);
 };
 
 export const analyzeProductData = async (
