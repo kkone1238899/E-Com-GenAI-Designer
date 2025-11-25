@@ -9,6 +9,7 @@ export const translations = {
     selectKeyBtn: "Select API Key",
     viewBilling: "View Billing Documentation",
     analyzing: "Analyzing Strategy...",
+    analyzingDesc: "Gemini is analyzing your product images and features to construct a high-conversion sales narrative.",
     generating: "Designing...",
     completed: "Design Completed",
     generatingDesc: "Generating assets based on your configuration...",
@@ -17,10 +18,16 @@ export const translations = {
     refinedTitle: "OPTIMIZED TITLE",
     marketingTone: "TONE",
     pageSections: "Structure Planning",
+    mainImages: "5 Main Images (Carousel)",
     previewAwaits: "Preview Awaits",
     previewDesc: "Upload a product to generate a high-conversion Douyin detail page.",
     downloadPackage: "Download Assets (ZIP)",
     downloading: "Zipping...",
+    // Storage / State
+    draftRestored: "Draft Restored",
+    autoSaved: "Auto-saved",
+    newProject: "New Project",
+    resetConfirm: "Are you sure? This will delete your current generated images and copy.",
     // Input Step
     createPageTitle: "Create Douyin Product Page",
     productImageLabel: "Product Images",
@@ -79,6 +86,13 @@ export const translations = {
       specs_size: "Specs & Size",
       trust_endorsement: "Trust & Service",
       promotion_cta: "Promotion CTA"
+    },
+    heroTypes: {
+      front_80: "Main: Front View (80%)",
+      side_cut: "Main: Side/Fit View",
+      detail_zoom: "Main: Detail & Value",
+      scenario_life: "Main: Lifestyle Scenario",
+      trust_brand: "Main: Brand Trust"
     }
   },
   zh: {
@@ -90,6 +104,7 @@ export const translations = {
     selectKeyBtn: "选择 API 密钥",
     viewBilling: "查看计费文档",
     analyzing: "正在策划营销方案...",
+    analyzingDesc: "Gemini 正在深入分析您的产品图片和卖点，构建高转化率的销售叙事框架。",
     generating: "正在生成素材...",
     completed: "设计完成",
     generatingDesc: "正在根据您的配置生成视觉素材...",
@@ -98,10 +113,16 @@ export const translations = {
     refinedTitle: "爆款标题",
     marketingTone: "营销基调",
     pageSections: "详情页结构规划",
+    mainImages: "5张主图设计规划",
     previewAwaits: "等待预览",
     previewDesc: "上传产品，AI 将为您生成抖音风格的长图详情页方案。",
     downloadPackage: "打包下载素材 (ZIP)",
     downloading: "正在打包...",
+    // Storage / State
+    draftRestored: "已恢复上次草稿",
+    autoSaved: "自动保存",
+    newProject: "新建项目",
+    resetConfirm: "确定要新建吗？当前生成的图片和文案将会丢失。",
     // Input Step
     createPageTitle: "创建抖音详情页",
     productImageLabel: "产品图片组",
@@ -160,6 +181,13 @@ export const translations = {
       specs_size: "尺寸规格表",
       trust_endorsement: "信任背书",
       promotion_cta: "促销转化区"
+    },
+    heroTypes: {
+      front_80: "主图 1: 正面全貌 (80%占比)",
+      side_cut: "主图 2: 侧面版型/剪裁",
+      detail_zoom: "主图 3: 核心细节+价值",
+      scenario_life: "主图 4: 生活化场景",
+      trust_brand: "主图 5: 品牌信任背书"
     }
   }
 };

@@ -1,38 +1,31 @@
 
-import React, { useState } from 'react';
-import { AnalysisResult, GeneratedSection, ReferenceImage } from '../types';
-import { ShoppingBag, Star, Share2, MoreHorizontal, ChevronLeft, MessageCircle, Store, ChevronRight } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { AnalysisResult, GeneratedSection, ReferenceImage, HeroImage } from '../types';
+import { ShoppingBag, Share2, MoreHorizontal, ChevronLeft, MessageCircle, Store, ChevronRight, Wand2 } from 'lucide-react';
 import { translations } from '../constants/translations';
 
 interface PreviewProps {
   analysis: AnalysisResult;
-  referenceImages: ReferenceImage[];
+  referenceImages: ReferenceImage[]; // Kept for fallback or logic if needed
   lang: 'zh' | 'en';
 }
 
-const Preview: React.FC<PreviewProps> = ({ analysis, referenceImages, lang }) => {
+const Preview: React.FC<PreviewProps> = ({ analysis, lang }) => {
   const t = translations[lang];
   const [activeSlide, setActiveSlide] = useState(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   const renderSection = (section: GeneratedSection) => {
-    // Determine visuals
     const displayImage = section.generatedImageUrl;
     const isTextOnly = section.type === 'specs_size' || section.type === 'trust_endorsement';
-    const isPromo = section.type === 'promotion_cta';
 
-    // Fallback: If no generated image, use a placeholder style if it's meant to be visual
-    // But in "Draft" mode we might just show text if image isn't generated yet.
-    
     return (
       <div key={section.id} className="relative w-full mb-1 group">
-        
-        {/* Visual Poster Sections */}
         {!isTextOnly && (
           <div className="relative w-full bg-white">
              {displayImage ? (
                 <div className="relative w-full">
                   <img src={displayImage} alt={section.title} className="w-full h-auto object-cover" />
-                  {/* Overlay for Impact Header or Promotion */}
                   {(section.type === 'header_impact' || section.type === 'promotion_cta' || section.overlayText) && (
                     <div className="absolute bottom-0 w-full bg-gradient-to-t from-black/80 to-transparent p-6 pt-12">
                       <h3 className="text-white font-bold text-xl leading-tight mb-2 drop-shadow-md">{section.overlayText || section.title}</h3>
@@ -41,7 +34,6 @@ const Preview: React.FC<PreviewProps> = ({ analysis, referenceImages, lang }) =>
                   )}
                 </div>
              ) : (
-               // Placeholder when not generated yet
                <div className="w-full aspect-[4/5] bg-gray-50 flex flex-col items-center justify-center p-8 text-center border-b border-gray-100">
                   <div className="mb-3 text-gray-300">
                      {section.status === 'generating' ? (
@@ -58,7 +50,6 @@ const Preview: React.FC<PreviewProps> = ({ analysis, referenceImages, lang }) =>
           </div>
         )}
 
-        {/* Text / Data Sections */}
         {isTextOnly && (
            <div className="bg-white p-6 mb-2">
               <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center before:w-1 before:h-5 before:bg-orange-500 before:mr-3 before:rounded-full">
@@ -96,6 +87,18 @@ const Preview: React.FC<PreviewProps> = ({ analysis, referenceImages, lang }) =>
     setActiveSlide(index);
   };
 
+  const scrollPrev = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -scrollContainerRef.current.clientWidth, behavior: 'smooth' });
+    }
+  };
+
+  const scrollNext = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: scrollContainerRef.current.clientWidth, behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="w-full max-w-[375px] mx-auto bg-gray-100 h-[800px] rounded-[2.5rem] border-[8px] border-gray-900 shadow-2xl overflow-hidden flex flex-col relative font-sans">
       
@@ -112,14 +115,14 @@ const Preview: React.FC<PreviewProps> = ({ analysis, referenceImages, lang }) =>
 
       {/* 2. Top Navigation (Transparent floating) */}
       <div className="absolute top-10 w-full z-20 px-4 flex justify-between items-center text-white drop-shadow-lg">
-         <div className="w-8 h-8 bg-black/20 backdrop-blur-md rounded-full flex items-center justify-center">
+         <div className="w-8 h-8 bg-black/20 backdrop-blur-md rounded-full flex items-center justify-center cursor-pointer hover:bg-black/30 transition-colors">
            <ChevronLeft size={20} />
          </div>
          <div className="flex gap-3">
-            <div className="w-8 h-8 bg-black/20 backdrop-blur-md rounded-full flex items-center justify-center">
+            <div className="w-8 h-8 bg-black/20 backdrop-blur-md rounded-full flex items-center justify-center cursor-pointer hover:bg-black/30 transition-colors">
               <Share2 size={18} />
             </div>
-            <div className="w-8 h-8 bg-black/20 backdrop-blur-md rounded-full flex items-center justify-center">
+            <div className="w-8 h-8 bg-black/20 backdrop-blur-md rounded-full flex items-center justify-center cursor-pointer hover:bg-black/30 transition-colors">
               <MoreHorizontal size={18} />
             </div>
          </div>
@@ -128,30 +131,66 @@ const Preview: React.FC<PreviewProps> = ({ analysis, referenceImages, lang }) =>
       {/* 3. Main Scrollable Area */}
       <div className="flex-1 overflow-y-auto hide-scrollbar pb-24 bg-gray-100">
         
-        {/* A. Hero Carousel (Using Reference Images) */}
-        <div className="relative w-full aspect-square bg-gray-200">
-           {referenceImages.length > 0 ? (
-             <div 
-              className="flex w-full h-full overflow-x-auto snap-x snap-mandatory hide-scrollbar"
-              onScroll={handleScroll}
-             >
-               {referenceImages.map((img) => (
-                 <div key={img.id} className="w-full h-full flex-shrink-0 snap-center relative">
-                    <img 
-                      src={`data:${img.mimeType};base64,${img.base64}`} 
-                      className="w-full h-full object-cover" 
-                      alt={img.label} 
-                    />
-                 </div>
-               ))}
-             </div>
+        {/* A. Hero Carousel (Using GENERATED Hero Images) */}
+        <div className="relative w-full aspect-square bg-gray-200 group">
+           {analysis.heroImages.length > 0 ? (
+             <>
+               <div 
+                ref={scrollContainerRef}
+                className="flex w-full h-full overflow-x-auto snap-x snap-mandatory hide-scrollbar"
+                onScroll={handleScroll}
+               >
+                 {analysis.heroImages.map((heroImg) => (
+                   <div key={heroImg.id} className="w-full h-full flex-shrink-0 snap-center relative bg-white">
+                      {heroImg.generatedImageUrl ? (
+                         <img 
+                           src={heroImg.generatedImageUrl} 
+                           className="w-full h-full object-cover" 
+                           alt={heroImg.title} 
+                         />
+                      ) : (
+                         <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100 text-gray-400 p-8 text-center">
+                            {heroImg.status === 'generating' ? (
+                               <div className="w-10 h-10 border-2 border-orange-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                            ) : (
+                               <div className="w-16 h-16 rounded-full bg-gray-200 mb-4 flex items-center justify-center">
+                                  <Wand2 size={24} className="opacity-50"/>
+                               </div>
+                            )}
+                            <h4 className="text-sm font-bold text-gray-800 mb-1">{t.heroTypes[heroImg.type]}</h4>
+                            <p className="text-xs max-w-[200px]">{t.planningDesc}</p>
+                         </div>
+                      )}
+                      
+                      {/* Badge for Image Type */}
+                      <div className="absolute bottom-4 left-4 bg-black/40 backdrop-blur-sm text-white text-[10px] px-2 py-1 rounded">
+                         {t.heroTypes[heroImg.type]}
+                      </div>
+                   </div>
+                 ))}
+               </div>
+               
+               {/* Carousel Controls */}
+               <button 
+                  onClick={scrollPrev}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white z-10 hover:bg-black/40 transition-colors opacity-0 group-hover:opacity-100"
+               >
+                  <ChevronLeft size={16} />
+               </button>
+               <button 
+                  onClick={scrollNext}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white z-10 hover:bg-black/40 transition-colors opacity-0 group-hover:opacity-100"
+               >
+                  <ChevronRight size={16} />
+               </button>
+
+               <div className="absolute bottom-4 right-4 bg-black/40 text-white text-xs px-2.5 py-1 rounded-full backdrop-blur-sm z-10 font-medium tabular-nums">
+                 {activeSlide + 1} / {analysis.heroImages.length}
+               </div>
+             </>
            ) : (
-             <div className="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
+             <div className="w-full h-full flex items-center justify-center text-gray-400">Initializing...</div>
            )}
-           
-           <div className="absolute bottom-4 right-4 bg-black/40 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm z-10">
-             {activeSlide + 1}/{referenceImages.length || 1}
-           </div>
         </div>
 
         {/* B. Flash Sale Price Block */}

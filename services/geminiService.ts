@@ -28,9 +28,19 @@ export const analyzeProductData = async (
     Features: ${features}
 
     YOUR TASK:
-    Plan the structure for a "High-Conversion Product Detail Page" (Long Image) based strictly on the following FRAMEWORK.
+    Plan the content for a high-conversion product page. 
+    You must output TWO parts: 
+    1. A plan for 5 Specific Main Images (Hero Carousel).
+    2. A plan for the Detail Page (Long Image) structure.
 
-    FRAMEWORK (8 Modules):
+    PART 1: 5 MAIN IMAGES (Hero Carousel) Rules:
+    1. **Front View (front_80)**: Product full frontal view, 80% screen occupancy, pure white background. Clean and official.
+    2. **Side/Fit View (side_cut)**: Side angle showing the cut, silhouette, or thickness.
+    3. **Detail Zoom (detail_zoom)**: Extreme close-up of texture/material + "Value Proposition" overlay text.
+    4. **Scenario (scenario_life)**: Lifestyle/In-use context. Emotional connection.
+    5. **Trust/Brand (trust_brand)**: Brand packaging, quality control tag, or "Official Authentic" seal style.
+
+    PART 2: DETAIL PAGE FRAMEWORK (8 Modules):
     1. **Impact Header (header_impact)**: Visual shock, Promo info, Coupon. 
     2. **Product Display (product_display)**: High-quality Front or Side angle. Showing the full product cleanly.
     3. **Core Selling Points (selling_point_fabe)**: Use FABE (Feature-Advantage-Benefit-Evidence). Focus on solution.
@@ -41,14 +51,16 @@ export const analyzeProductData = async (
     8. **Promotion CTA (promotion_cta)**: Urgency, "Buy Now", final call.
 
     IMAGE SELECTION RULES:
-    I have provided multiple images with IDs. You MUST select the most appropriate 'referenceImageId' for each section.
-    - For 'product_display', prefer 'main' labeled images.
-    - For 'detail_craft', prefer 'detail' or 'texture' labeled images.
-    - For 'scenario_usage', prefer 'usage' labeled images if available, otherwise 'main'.
+    I have provided multiple images with IDs and LABELS. You MUST select the most appropriate 'referenceImageId' for each section.
+    - For 'front_80', 'product_display', prefer 'main' labeled images.
+    - For 'detail_zoom', 'detail_craft', prefer 'detail' or 'texture' labeled images.
+    - For 'scenario_life', 'scenario_usage', prefer 'usage' labeled images if available, otherwise 'main'.
+    
+    CRITICAL: Ensure that the 'referenceImageId' matches one of the provided Image IDs exactly.
 
     OUTPUT REQUIREMENTS:
-    - Generate 6-10 sections total.
-    - 'imagePrompt': Detailed ENGLISH prompt for Gemini 3 Pro Image Generation. 
+    - Generate strictly JSON.
+    - 'imagePrompt': Detailed ENGLISH prompt for Gemini 3 Pro Image Generation.
        * Include lighting (studio, natural), angle (front, flat lay), and style (C4D, photography).
        * Keep the product identity from the reference image.
     - 'overlayText': 2-5 words, punchy, poster style.
@@ -71,6 +83,23 @@ export const analyzeProductData = async (
       refinedSellingPoints: { type: Type.ARRAY, items: { type: Type.STRING } },
       priceEstimate: { type: Type.STRING },
       marketingTone: { type: Type.STRING },
+      heroImages: {
+        type: Type.ARRAY,
+        items: {
+          type: Type.OBJECT,
+          properties: {
+            id: { type: Type.STRING },
+            type: { 
+              type: Type.STRING, 
+              enum: ['front_80', 'side_cut', 'detail_zoom', 'scenario_life', 'trust_brand']
+            },
+            title: { type: Type.STRING, description: "Short title for the image type, e.g. Front View" },
+            imagePrompt: { type: Type.STRING },
+            referenceImageId: { type: Type.STRING }
+          },
+          required: ['id', 'type', 'title', 'imagePrompt', 'referenceImageId']
+        }
+      },
       sections: {
         type: Type.ARRAY,
         items: {
@@ -100,7 +129,7 @@ export const analyzeProductData = async (
         }
       }
     },
-    required: ['refinedTitle', 'refinedSellingPoints', 'priceEstimate', 'marketingTone', 'sections']
+    required: ['refinedTitle', 'refinedSellingPoints', 'priceEstimate', 'marketingTone', 'heroImages', 'sections']
   };
 
   const response = await ai.models.generateContent({
@@ -141,7 +170,7 @@ export const generateProductImage = async (
             text: `Generate a high-quality e-commerce image.
             CONTEXT: ${prompt}
             CONSTRAINT: The main product from the reference image MUST appear clearly.
-            ASPECT RATIO: 1:1 or 3:4.
+            ASPECT RATIO: 1:1.
             STYLE: Commercial photography, high resolution, sharp details.` 
           },
         ],

@@ -32,6 +32,19 @@ export type DouyinSectionType =
   | 'trust_endorsement'  // 信任背书区
   | 'promotion_cta';     // 促销转化区
 
+export type HeroImageType = 'front_80' | 'side_cut' | 'detail_zoom' | 'scenario_life' | 'trust_brand';
+
+export interface HeroImage {
+  id: string;
+  type: HeroImageType;
+  title: string;
+  imagePrompt: string;
+  referenceImageId?: string;
+  generatedImageUrl?: string;
+  status: 'pending' | 'generating' | 'completed' | 'failed';
+  isEditing?: boolean;
+}
+
 export interface GeneratedSection {
   id: string;
   type: DouyinSectionType;
@@ -50,5 +63,6 @@ export interface AnalysisResult {
   refinedSellingPoints: string[];
   priceEstimate: string;
   marketingTone: string;
-  sections: GeneratedSection[];
+  heroImages: HeroImage[]; // The 5 Main Images
+  sections: GeneratedSection[]; // The Detail Page "Long Image" Slices
 }
